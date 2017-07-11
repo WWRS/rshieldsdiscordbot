@@ -4,10 +4,7 @@ dir = File.dirname(__FILE__)
 
 ::RBNACL_LIBSODIUM_GEM_LIB_PATH="#{dir}/lib/libsodium.so"
 
-#require'dotenv'
-#Dotenv.load
-
-tokentxt='Mjg1NjQ5NTg3Njg2MDgwNTIz.C5VPbw.eBMnABqxYGSwbTS8VxKXqF7WukE'
+require'dotenv/load'
 
 require'discordrb'
 
@@ -118,8 +115,8 @@ class CommandBot
 end
 
 bot=Discordrb::Commands::CommandBot.new(
-	token: tokentxt,
-	client_id: 285649587686080523,
+	token: ENV['TOKEN'],
+	client_id: ENV['APPID'],
 	prefix: ['r$','brazilianreal','brazilian real','brl'],
 	spaces_allowed: true,
 	advanced_functionality: true #required for command chains
