@@ -1,7 +1,7 @@
 ::RBNACL_LIBSODIUM_GEM_LIB_PATH = "libsodium.dll"
 require_relative'discordrb'
 
-tokentxt = File.open('C:/token.txt').gets.chomp
+tokentxt = gets.chomp
 
 bot=Discordrb::Commands::CommandBot.new(
 	token: tokentxt,
