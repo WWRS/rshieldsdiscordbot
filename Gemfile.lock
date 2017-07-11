@@ -43,8 +43,6 @@ PLATFORMS
 
 DEPENDENCIES
   discordrb
-  ffi
-  opus-ruby
   rbnacl-libsodium
 
 RUBY VERSION

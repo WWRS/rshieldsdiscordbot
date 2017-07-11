@@ -1,8 +1,9 @@
-#::RBNACL_LIBSODIUM_GEM_LIB_PATH = "libsodium.dll"
-require 'discordrb'
-require 'rbnacl/libsodium'
+#::RBNACL_LIBSODIUM_GEM_LIB_PATH = 'libsodium.dll'
+p RUBY_DESCRIPTION
+#require'rbnacl/libsodium'
+require'discordrb'
 
-tokentxt = 'Mjg1NjQ5NTg3Njg2MDgwNTIz.C5VPbw.eBMnABqxYGSwbTS8VxKXqF7WukE'
+tokentxt='Mjg1NjQ5NTg3Njg2MDgwNTIz.C5VPbw.eBMnABqxYGSwbTS8VxKXqF7WukE'
 
 class CommandBot
 	def initialize(attributes = {})
@@ -110,7 +111,6 @@ class CommandBot
 	end
 end
 
-
 bot=Discordrb::Commands::CommandBot.new(
 	token: tokentxt,
 	client_id: 285649587686080523,
@@ -118,6 +118,8 @@ bot=Discordrb::Commands::CommandBot.new(
 	spaces_allowed: true,
 	advanced_functionality: true #required for command chains
 )
+
+voicebot = nil;
 
 # Commands go here!
 #ping
@@ -175,17 +177,25 @@ bot.command([:getnum,:getnumber,:to_f],{description:"Grabs the first number in t
 }
 #stupid
 stupidcounter=-1;	#makes sure cycles work.
-	#Change this array.
-stupidarray=%w(http://image.prntscr.com/image/160a60a9e3454c4bbb08ddd00aac980f.png
-		http://image.prntscr.com/image/b871f15d6f1e4e63b05b81d2d3d13fdc.png
-		http://i.imgur.com/pS698mS.png
-		http://image.prntscr.com/image/53999e3b330d4103ac46d9b2ebecc6b1.png
-		http://i.imgur.com/W8mYJ73.png
-		http://i.imgur.com/FMLBKey.png
-		http://i.imgur.com/iKVK8Hx.png)
+stupidarray=File.open('stupidarray.txt').readlines
 bot.command([:stupid],{description:"Guaranteed to get you a screenshot of stupid. What stupid? RStupid.",usage:"stupid"}){
 	stupidcounter = (stupidcounter+1)%stupidarray.size	#Handle cycling
 	stupidarray[stupidcounter]							#Return link
+}
+#join
+bot.command(:join, {description:"Join a channel",usage:"join [channel]"}){|e,chan|
+	channel = e.channel.server.channels.select{|h|h.name==chan&&h.voice?}[0]
+	if channel!=nil
+		voicebot = bot.voice_connect(channel, encrypted=true)
+	else
+		"Invalid channel name."
+	end
+	return
+}
+#leave
+bot.command(:leave, {description:"Leave the channel",usage:"leave"}){|e,chan|
+	voicebot.destroy
+	return
 }
 #!
 bot.command(:!, {description:"!",usage:"! [channel]"}){|e,chan|
@@ -193,14 +203,15 @@ bot.command(:!, {description:"!",usage:"! [channel]"}){|e,chan|
 	if channel!=nil
 		voicebot = bot.voice_connect(channel, encrypted=true)
 		voicebot.play_file("mgexclamation.mp3")
-		bot.voice_destroy(channel)
+		voicebot.destroy
 	else
 		"Invalid channel name."
 	end
+	return
 }
-bot.command(:inviteme,{description:"You can't actually invite me.",usage:"inviteme"}){
-	"Invite me! #{bot.invite_url}"
-}
+#bot.command(:inviteme,{description:"You can't actually invite me.",usage:"inviteme"}){
+#	"Invite me! #{bot.invite_url}"
+#}
 
 bot.run
 #bot.game="Notepad++"
