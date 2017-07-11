@@ -1,5 +1,4 @@
-p uname
-
+p RUBY_PLATFORM
 
 require'rbnacl/libsodium'
 require'opus-ruby'
