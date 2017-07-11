@@ -23,6 +23,8 @@ GEM
       ffi
     rbnacl (3.4.0)
       ffi
+    rbnacl-libsodium (1.0.11)
+      rbnacl (>= 3.0.1)
     rest-client (2.0.2-x64-mingw32)
       ffi (~> 1.9)
       http-cookie (>= 1.0.2, < 2.0)
@@ -41,6 +43,9 @@ PLATFORMS
 
 DEPENDENCIES
   discordrb
+  ffi
+  opus-ruby
+  rbnacl-libsodium
 
 RUBY VERSION
    ruby 2.3.3p222
