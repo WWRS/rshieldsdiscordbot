@@ -1,6 +1,7 @@
-require'rbnacl/libsodium'
-require'opus-ruby'
 require'discordrb'
+
+require 'dotenv'
+Dotenv.load
 
 tokentxt='Mjg1NjQ5NTg3Njg2MDgwNTIz.C5VPbw.eBMnABqxYGSwbTS8VxKXqF7WukE'
 
