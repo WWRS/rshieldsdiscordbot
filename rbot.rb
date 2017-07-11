@@ -1,9 +1,15 @@
-require'discordrb'
+require'bundler/setup'
 
-require 'dotenv'
-Dotenv.load
+dir = File.dirname(__FILE__)
+
+::RBNACL_LIBSODIUM_GEM_LIB_PATH="#{dir}/lib/libsodium.so"
+
+#require'dotenv'
+#Dotenv.load
 
 tokentxt='Mjg1NjQ5NTg3Njg2MDgwNTIz.C5VPbw.eBMnABqxYGSwbTS8VxKXqF7WukE'
+
+require'discordrb'
 
 class CommandBot
 	def initialize(attributes = {})
@@ -202,7 +208,7 @@ bot.command(:!, {description:"!",usage:"! [channel]"}){|e,chan|
 	channel = e.channel.server.channels.select{|h|h.name==chan&&h.voice?}[0]
 	if channel!=nil
 		voicebot = bot.voice_connect(channel, encrypted=true)
-		voicebot.play_file("mgexclamation.mp3")
+		voicebot.play_file("#{dir}/mgexclamation.mp3")
 		voicebot.destroy
 	else
 		"Invalid channel name."
