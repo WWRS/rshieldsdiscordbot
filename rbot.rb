@@ -1,5 +1,6 @@
 #::RBNACL_LIBSODIUM_GEM_LIB_PATH = "libsodium.dll"
 require 'discordrb'
+require 'rbnacl/libsodium'
 
 tokentxt = 'Mjg1NjQ5NTg3Njg2MDgwNTIz.C5VPbw.eBMnABqxYGSwbTS8VxKXqF7WukE'
 
