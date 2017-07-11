@@ -1,5 +1,5 @@
 require'rbnacl/libsodium'
-resuire'opus-ruby'
+require'opus-ruby'
 require'discordrb'
 
 tokentxt='Mjg1NjQ5NTg3Njg2MDgwNTIz.C5VPbw.eBMnABqxYGSwbTS8VxKXqF7WukE'
