@@ -1,11 +1,6 @@
 require'bundler/setup'
-
-dir = File.dirname(__FILE__)
-
-::RBNACL_LIBSODIUM_GEM_LIB_PATH="#{dir}/lib/libsodium.so"
-
+require'rbnacl/libsodium'
 require'dotenv/load'
-
 require'discordrb'
 
 class CommandBot
@@ -122,6 +117,7 @@ bot=Discordrb::Commands::CommandBot.new(
 	advanced_functionality: true #required for command chains
 )
 
+dir = File.dirname(__FILE__)
 voicebot = nil;
 
 # Commands go here!
