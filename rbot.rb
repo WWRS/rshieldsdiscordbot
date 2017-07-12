@@ -2,8 +2,11 @@ require'bundler/setup'
 require'rbnacl/libsodium'
 require'dotenv/load'
 
+require'ffi'
 require'opus-ruby'
-module Opus
+module Rtricksopus
+	extend FFI::Library
+	
 	opus_dir = File.expand_path("..", __FILE__)
 	p opus_dir
 	opus_glob = case RUBY_DESCRIPTION
@@ -14,6 +17,9 @@ module Opus
 	loc = Dir.glob(File.join(opus_dir, opus_glob)).first
 	p loc
 	ffi_lib loc
+end
+module Opus
+	prepend Rtricksopus
 end
 
 require'discordrb'
