@@ -6,14 +6,12 @@ module Rtricksopus
 	def ffi_lib(*names)
 		if names == ['opus']
 			opus_dir = File.expand_path("..", __FILE__)
-			p opus_dir
 			opus_glob = case RUBY_DESCRIPTION
 				when /darwin/ then "opus*.dylib"
 				when /Windows|(win|mingw)32/ then "opus*.dll"
 				else "opus*.so"
 			end
 			loc = Dir.glob(File.join(opus_dir, opus_glob)).first
-			p loc
 			names = [loc]
 		end
 		super(names)
