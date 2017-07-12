@@ -82,6 +82,8 @@ bot=Discordrb::Commands::CommandBot.new(
 dir=File.dirname(__FILE__)
 voicebot=nil
 
+bot.bucket :voice, limit: 10, time_span: 60, delay: 5
+
 # Commands go here!
 #ping
 bot.command(:ping,{description:"Pong!",usage:"ping"}){
@@ -129,11 +131,11 @@ bot.command([:calc],{description:"Runs simple arithmetic.",usage:"calc [expressi
 }
 #getnum/getnumber/to_f
 bot.command([:getnum,:getnumber,:to_f],{description:"Grabs the first number in the input and returns as a float.",usage:"getnumber [expression]"}){|e,*str|
-	fstr=str.join.gsub(/\D/,' ')	#Replace all non-digits with spaces
-	if fstr!=''						#If not empty,
-		fstr.to_f					#Return as float.
-	else							#If empty,
-		0							#Return 0.
+	fstr=str.join.gsub(/[^\d\.]/,' ')	#Replace all non-digits with spaces
+	if fstr!=''							#If not empty,
+		fstr.to_f						#Return as float.
+	else								#If empty,
+		0								#Return 0.
 	end
 }
 #stupid
@@ -144,7 +146,7 @@ bot.command([:stupid],{description:"Guaranteed to get you a screenshot of stupid
 	stupidarray[stupidcounter]							#Return link
 }
 #join
-bot.command(:join, {description:"Join a channel",usage:"join [channel]"}){|e,c|
+bot.command(:join, {description:"Join a channel",usage:"join [channel]",bucket: :voice}){|e,c|
 	channel = ( c == nil ? e.author.voice_channel : e.channel.server.channels.select{|h|h.name == c && h.voice?}[0] )
 	
 	if channel != nil
@@ -155,12 +157,12 @@ bot.command(:join, {description:"Join a channel",usage:"join [channel]"}){|e,c|
 	return
 }
 #leave
-bot.command(:leave, {description:"Leave the channel",usage:"leave"}){
+bot.command(:leave, {description:"Leave the channel",usage:"leave",bucket: :voice}){
 	voicebot.destroy
 	return
 }
 #!
-bot.command(:!, {description:"!",usage:"! [channel]"}){|e,c|
+bot.command(:!, {description:"!",usage:"! [channel]",bucket: :voice}){|e,c|
 	channel = ( c == nil ? e.author.voice_channel : e.channel.server.channels.select{|h|h.name == c && h.voice?}[0] )
 	
 	if channel != nil
