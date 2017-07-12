@@ -91,16 +91,13 @@ bot.command(:ping,{description:"Pong!",usage:"ping"}){
 }
 #roll/rand/random
 bot.command([:roll,:rand,:random],{description:"Gets a random number from 1 to [max], inclusive.",usage:"roll [max]"}){|e,max,*b|
-	if max														#If the user sent a max
-		if max=="4chan"											#The user tried to roll4chan
-			bot.execute_command(:roll4chan,e,b)
-		elsif (intmax=max.to_i)>0								#Anything under 1 won't work.
-			"Rolled: #{rand(intmax)+1} (#{intmax})"
-		else													#Negative input
-			"Bad input #{max} . Good inputs are ints above 0."
-		end
-	else														#The user did not send a max. Default: 100
-		"Rolled: #{rand(100)+1} (100)"
+	max = 100 if !max
+	if max=="4chan"											#The user tried to roll4chan
+		bot.execute_command(:roll4chan, e, b)
+	elsif (intmax=max.to_i)>0								#Anything under 1 won't work.
+		"Rolled: #{rand(intmax)+1} (out of #{intmax})"
+	else													#Negative input
+		"Bad input #{max} . Good inputs are ints above 0."
 	end
 }
 #flip/coinflip
@@ -109,23 +106,22 @@ bot.command([:flip,:coinflip],{description:"Flips a coin",usage:"coinflip"}){
 }
 #roll4chan
 bot.command([:roll4chan],{description:"Gets a random number from 0000 to 9999, inclusive.",usage:"4chanroll"}){|e,digits|
-	if (d=digits.to_i)>0
-		"Rolled: #{rand(10**d).to_s.rjust(d,?0)} (4chan, #{d})"
-	else
-		"Rolled: #{rand(1e4).to_s.rjust(4,?0)} (4chan, 4)"
-	end
+	d = digits.to_i>0 ? digits.to_i : 4
+	"Rolled: #{rand(10**d).to_s.rjust(d, ?0)} (4chan style, #{d} digits)"
 }
 #calc
 bot.command([:calc],{description:"Runs simple arithmetic.",usage:"calc [expression]"}){|e,*str|
-	fstr=str.join.gsub(/[^0-9+-\/*\(\)\.]/,'')		#Remove all non-math stuff
-	fstr=fstr.gsub(/(\d+)/,'\1.to_f') if fstr=~/\//	#Convert to floats if division
-	if fstr!=''										#Making sure we don't send nothing
-		begin										#In case of invalid expression
-			"Calculated: #{eval(fstr).round(9)}"
-		rescue Exception => e						#Invalid expression
+	fstr=str.join.gsub(/[^0-9+-\/*\(\)\.]/,'')			#Remove all non-math stuff
+	fstr=fstr.gsub(/(\d+)/, '\1.to_f') if fstr=~/\//	#Convert to floats if division
+	if fstr!=''											#Making sure we don't send nothing
+		begin											#In case of invalid expression
+			out = eval(fstr).round(9)					#In case of roundoff error
+			out = out.to_i if out%1==0					#To integer if possible
+			"Calculated: #{out}"
+		rescue Exception => e							#Invalid expression
 			"Bad input: #{str.join}"
 		end
-	else											#Invalid expression
+	else												#Invalid expression
 		"Bad input: #{str.join}"
 	end
 }
