@@ -1,1 +1,1 @@
-worker: bundle exec ruby rbot.rb -p $PORT
+worker: bundle exec ruby rbot.rb
