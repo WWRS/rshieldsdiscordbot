@@ -95,12 +95,12 @@ bot.command([:roll,:rand,:random],{description:"Gets a random number from 1 to [
 		if max=="4chan"											#The user tried to roll4chan
 			bot.execute_command(:roll4chan,e,b)
 		elsif (intmax=max.to_i)>0								#Anything under 1 won't work.
-			"Rolled (#{intmax}): #{rand(intmax)+1}"
+			"Rolled: #{rand(intmax)+1} (#{intmax})"
 		else													#Negative input
 			"Bad input #{max} . Good inputs are ints above 0."
 		end
 	else														#The user did not send a max. Default: 100
-		"Rolled (100): #{rand(100)+1}"
+		"Rolled: #{rand(100)+1} (100)"
 	end
 }
 #flip/coinflip
@@ -110,9 +110,9 @@ bot.command([:flip,:coinflip],{description:"Flips a coin",usage:"coinflip"}){
 #roll4chan
 bot.command([:roll4chan],{description:"Gets a random number from 0000 to 9999, inclusive.",usage:"4chanroll"}){|e,digits|
 	if (d=digits.to_i)>0
-		"Rolled (4chan, #{d}): #{rand(10**d).to_s.rjust(d,?0)}"
+		"Rolled: #{rand(10**d).to_s.rjust(d,?0)} (4chan, #{d})"
 	else
-		"Rolled (4chan, 4): #{rand(1e4).to_s.rjust(4,?0)}"
+		"Rolled: #{rand(1e4).to_s.rjust(4,?0)} (4chan, 4)"
 	end
 }
 #calc
@@ -159,6 +159,7 @@ bot.command(:join, {description:"Join a channel",usage:"join [channel]",bucket: 
 #leave
 bot.command(:leave, {description:"Leave the channel",usage:"leave",bucket: :voice}){
 	voicebot.destroy
+	p voicebot
 	return
 }
 #!
