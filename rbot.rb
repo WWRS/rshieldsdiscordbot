@@ -2,17 +2,19 @@ require'bundler/setup'
 require'rbnacl/libsodium'
 require'dotenv/load'
 
-require'ffi'
-opus_dir = File.expand_path("..", __FILE__)
-p opus_dir
-opus_glob = case RUBY_DESCRIPTION
-	when /darwin/ then "opus*.dylib"
-	when /Windows|(win|mingw)32/ then "opus*.dll"
-	else "opus*.so"
+require'opus-ruby'
+module Opus
+	opus_dir = File.expand_path("..", __FILE__)
+	p opus_dir
+	opus_glob = case RUBY_DESCRIPTION
+		when /darwin/ then "opus*.dylib"
+		when /Windows|(win|mingw)32/ then "opus*.dll"
+		else "opus*.so"
+	end
+	loc = Dir.glob(File.join(opus_dir, opus_glob)).first
+	p loc
+	ffi_lib loc
 end
-loc = Dir.glob(File.join(opus_dir, opus_glob)).first
-p loc
-ffi_lib loc
 
 require'discordrb'
 
