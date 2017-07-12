@@ -1,6 +1,5 @@
 require'bundler/setup'
 require'rbnacl/libsodium'
-require'dotenv/load'
 
 require'ffi'
 require'opus-ruby'
@@ -17,6 +16,8 @@ module Rtricksopus
 	loc = Dir.glob(File.join(opus_dir, opus_glob)).first
 	p loc
 	ffi_lib loc
+	
+	super
 end
 module Opus
 	prepend Rtricksopus
