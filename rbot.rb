@@ -1,79 +1,30 @@
 require'bundler/setup'
 require'rbnacl/libsodium'
 require'dotenv/load'
+
+require'ffi'
+opus_dir = File.expand_path("..", __FILE__)
+p opus_dir
+opus_glob = case RUBY_DESCRIPTION
+	when /darwin/ then "opus*.dylib"
+	when /Windows|(win|mingw)32/ then "opus*.dll"
+	else "opus*.so"
+end
+loc = Dir.glob(File.join(opus_dir, opus_glob)).first
+p loc
+ffi_lib loc
+
 require'discordrb'
 
-class CommandBot
+module Rtrickscommandbot
+	def execute_command(name, event, arguments, chained = false, check_permissions = true)
+	    super(name.downcase.to_sym, event, arguments, chained, check_permissions)
+	end
 	def initialize(attributes = {})
-		super(
-			log_mode: attributes[:log_mode],
-			token: attributes[:token],
-			client_id: attributes[:client_id],
-			type: attributes[:type],
-			name: attributes[:name],
-			fancy_log: attributes[:fancy_log],
-			suppress_ready: attributes[:suppress_ready],
-			parse_self: attributes[:parse_self],
-			shard_id: attributes[:shard_id],
-			num_shards: attributes[:num_shards],
-			redact_token: attributes.key?(:redact_token) ? attributes[:redact_token] : true,
-			ignore_bots: attributes[:ignore_bots])
-
-		@prefix = attributes[:prefix]
-		@attributes = {
-			# Whether advanced functionality such as command chains are enabled
-			advanced_functionality: attributes[:advanced_functionality].nil? ? false : attributes[:advanced_functionality],
-			
-			# The name of the help command (that displays information to other commands). False if none should exist
-			help_command: attributes[:help_command].is_a?(FalseClass) ? nil : (attributes[:help_command] || :help),
-			
-			# The message to display for when a command doesn't exist, %command% to get the command name in question and nil for no message
-			# No default value here because it may not be desired behaviour
-			command_doesnt_exist_message: attributes[:command_doesnt_exist_message],
-			
-			# The message to be displayed when `NoPermission` error is raised.
-			no_permission_message: attributes[:no_permission_message],
-			
-			# Spaces allowed between prefix and command
-			spaces_allowed: attributes[:spaces_allowed].nil? ? false : attributes[:spaces_allowed],
-			
-			# Webhooks allowed to trigger commands
-			webhook_commands: attributes[:webhook_commands].nil? ? true : attributes[:webhook_commands],
-			
-			channels: attributes[:channels] || [],
-			
-			# All of the following need to be one character
-			# String to designate previous result in command chain
-			previous: attributes[:previous] || '~',
-			
-			# Command chain delimiter
-			chain_delimiter: attributes[:chain_delimiter] || '>',
-			
-			# Chain argument delimiter
-			chain_args_delim: attributes[:chain_args_delim] || ':',
-
-			# Sub-chain starting character
-			sub_chain_start: attributes[:sub_chain_start] || '[',
-
-			# Sub-chain ending character
-			sub_chain_end: attributes[:sub_chain_end] || ']',
-
-			# Quoted mode starting character
-			quote_start: attributes[:quote_start] || '"',
-
-			# Quoted mode ending character
-			quote_end: attributes[:quote_end] || '"'
-		}
-
-		@permissions = {
-			roles: {},
-			users: {}
-		}
-
-		return unless @attributes[:help_command]
+		super(attributes)
 		command(@attributes[:help_command], max_args: 1, description: 'Shows a list of all the commands available or displays help for a specific command.', usage: 'help [command name]') do |event, command_name|
 			if command_name
-				command_name.downcase!
+				command_name=command_name.downcase.to_sym #ADDED
 				command = @commands[command_name.to_sym]
 				return "The command `#{command_name}` does not exist!" unless command
 				desc = command.attributes[:description] || '*No description available*'
@@ -108,6 +59,11 @@ class CommandBot
 		end
 	end
 end
+module Discordrb::Commands
+	class CommandBot
+		prepend Rtrickscommandbot
+	end
+end
 
 bot=Discordrb::Commands::CommandBot.new(
 	token: ENV['TOKEN'],
@@ -117,8 +73,8 @@ bot=Discordrb::Commands::CommandBot.new(
 	advanced_functionality: true #required for command chains
 )
 
-dir = File.dirname(__FILE__)
-voicebot = nil;
+dir=File.dirname(__FILE__)
+voicebot=nil
 
 # Commands go here!
 #ping
@@ -182,9 +138,10 @@ bot.command([:stupid],{description:"Guaranteed to get you a screenshot of stupid
 	stupidarray[stupidcounter]							#Return link
 }
 #join
-bot.command(:join, {description:"Join a channel",usage:"join [channel]"}){|e,chan|
-	channel = e.channel.server.channels.select{|h|h.name==chan&&h.voice?}[0]
-	if channel!=nil
+bot.command(:join, {description:"Join a channel",usage:"join [channel]"}){|e,c|
+	channel = ( c == nil ? e.author.voice_channel : e.channel.server.channels.select{|h|h.name == c && h.voice?}[0] )
+	
+	if channel != nil
 		voicebot = bot.voice_connect(channel, encrypted=true)
 	else
 		"Invalid channel name."
@@ -192,21 +149,21 @@ bot.command(:join, {description:"Join a channel",usage:"join [channel]"}){|e,cha
 	return
 }
 #leave
-bot.command(:leave, {description:"Leave the channel",usage:"leave"}){|e,chan|
+bot.command(:leave, {description:"Leave the channel",usage:"leave"}){
 	voicebot.destroy
 	return
 }
 #!
-bot.command(:!, {description:"!",usage:"! [channel]"}){|e,chan|
-	channel = e.channel.server.channels.select{|h|h.name==chan&&h.voice?}[0]
-	if channel!=nil
+bot.command(:!, {description:"!",usage:"! [channel]"}){|e,c|
+	channel = ( c == nil ? e.author.voice_channel : e.channel.server.channels.select{|h|h.name == c && h.voice?}[0] )
+	
+	if channel != nil
 		voicebot = bot.voice_connect(channel, encrypted=true)
 		voicebot.play_file("#{dir}/mgexclamation.mp3")
 		voicebot.destroy
-	else
-		"Invalid channel name."
+		return
 	end
-	return
+	"Invalid channel name."
 }
 #bot.command(:inviteme,{description:"You can't actually invite me.",usage:"inviteme"}){
 #	"Invite me! #{bot.invite_url}"
